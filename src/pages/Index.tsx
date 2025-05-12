@@ -1,13 +1,51 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useState } from "react";
+import { Navigate, Link } from "react-router-dom";
+import AuthLayout from "@/components/auth/AuthLayout";
+import LoginForm from "@/components/auth/LoginForm";
+import RegisterForm from "@/components/auth/RegisterForm";
+import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
+
+type AuthView = "login" | "register" | "forgot-password";
 
 const Index = () => {
+  const [view, setView] = useState<AuthView>("login");
+  const [token, setToken] = useState<string | null>(localStorage.getItem("authToken"));
+
+  if (token) {
+    return <Navigate to="/dashboard" />;
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <AuthLayout>
+      {view === "login" && (
+        <LoginForm
+          onSuccess={(token) => {
+            localStorage.setItem("authToken", token);
+            setToken(token);
+          }}
+          onRegisterClick={() => setView("register")}
+          onForgotPasswordClick={() => setView("forgot-password")}
+        />
+      )}
+      
+      {view === "register" && (
+        <RegisterForm
+          onSuccess={(token) => {
+            localStorage.setItem("authToken", token);
+            setToken(token);
+          }}
+          onLoginClick={() => setView("login")}
+        />
+      )}
+      
+      {view === "forgot-password" && (
+        <ForgotPasswordForm
+          onBackToLoginClick={() => setView("login")}
+          onSuccess={() => setView("login")}
+        />
+      )}
+    </AuthLayout>
   );
 };
 
