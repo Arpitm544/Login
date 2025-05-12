@@ -54,11 +54,6 @@ const LoginForm = ({ onSuccess, onRegisterClick, onForgotPasswordClick }: LoginF
     }
   };
 
-  const handleGoogleLogin = () => {
-    // Redirect to the Google OAuth endpoint
-    window.location.href = "http://localhost:5000/api/auth/google";
-  };
-
   return (
     <Card className="w-full">
       <CardHeader>
@@ -98,18 +93,18 @@ const LoginForm = ({ onSuccess, onRegisterClick, onForgotPasswordClick }: LoginF
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <Button
-            variant="outline"
-            type="button"
-            className="w-full"
-            onClick={handleGoogleLogin}
-          >
-            Login with Google
-          </Button>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Logging in..." : "Login"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={onRegisterClick}
+          >
+            Registration
           </Button>
           <div className="text-center text-sm">
             Don&apos;t have an account?{" "}
