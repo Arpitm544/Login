@@ -223,27 +223,6 @@ const RegisterForm = ({ onSuccess, onLoginClick }: RegisterFormProps) => {
               </div>
             </div>
 
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={handleGoogleLogin}
-              disabled={isGoogleLoading}
-            >
-              {isGoogleLoading ? (
-                "Connecting..."
-              ) : (
-                <>
-                  <div className="mr-2 flex h-4 w-4">
-                    <div className="w-1 h-1 rounded-full bg-red-500" style={{ margin: '0.5px' }}></div>
-                    <div className="w-1 h-1 rounded-full bg-yellow-500" style={{ margin: '0.5px' }}></div>
-                    <div className="w-1 h-1 rounded-full bg-green-500" style={{ margin: '0.5px' }}></div>
-                    <div className="w-1 h-1 rounded-full bg-blue-500" style={{ margin: '0.5px' }}></div>
-                  </div>
-                  Continue with Google
-                </>
-              )}
-            </Button>
           </form>
         </Form>
       </CardContent>
