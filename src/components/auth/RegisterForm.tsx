@@ -90,7 +90,7 @@ const RegisterForm = ({ onSuccess, onLoginClick }: RegisterFormProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Login</CardTitle>
+         <CardTitle>Create an Account</CardTitle>
         <CardDescription>
           Enter your details to create a new account
         </CardDescription>
