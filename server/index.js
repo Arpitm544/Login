@@ -19,7 +19,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:8080', // Frontend URL
+  origin: process.env.CLIENT_URL || 'http://localhost:8080', // Frontend URL from env
   credentials: true
 }));
 app.use(express.json());
@@ -73,13 +73,24 @@ passport.deserializeUser(async (id, done) => {
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: 'http://localhost:5000/api/auth/google/callback'
+  callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback',
+  scope: ['profile', 'email']
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     // Check if user already exists
     let user = await User.findOne({ googleId: profile.id });
     
     if (!user) {
+      // Check if email exists but not linked to Google
+      const userByEmail = await User.findOne({ email: profile.emails[0].value });
+      
+      if (userByEmail) {
+        // Link Google ID to existing account
+        userByEmail.googleId = profile.id;
+        await userByEmail.save();
+        return done(null, userByEmail);
+      }
+      
       // Create new user
       user = new User({
         googleId: profile.id,
@@ -172,18 +183,31 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // Google OAuth routes
-app.get('/api/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+app.get('/api/auth/google', 
+  passport.authenticate('google', { 
+    scope: ['profile', 'email'],
+    prompt: 'select_account'
+  })
+);
 
 app.get('/api/auth/google/callback', 
-  passport.authenticate('google', { failureRedirect: 'http://localhost:8080/' }),
+  passport.authenticate('google', { 
+    failureRedirect: `${process.env.CLIENT_URL || 'http://localhost:8080'}?error=google_login_failed` 
+  }),
   (req, res) => {
     // Generate token
     const token = generateToken(req.user._id);
     
     // Redirect to frontend with token
-    res.redirect(`http://localhost:8080/dashboard?token=${token}`);
+    const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:8080'}/dashboard?token=${token}`;
+    res.redirect(redirectUrl);
   }
 );
+
+// Test route for Google OAuth
+app.get('/api/auth/google/test', (req, res) => {
+  res.send('Google OAuth test route is working. Use /api/auth/google to initiate the login flow.');
+});
 
 // Forgot password
 app.post('/api/auth/forgot-password', async (req, res) => {
