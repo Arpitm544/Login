@@ -13,7 +13,7 @@ app.use(express.json());
 
 // Connect DB
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB Connected'))
+  .then(() => console.log('MongoDB Connected',process.env.MONGO_URI))
   .catch((err) => console.log(err));
 
 // Signup
